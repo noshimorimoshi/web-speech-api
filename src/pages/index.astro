@@ -1,16 +1,65 @@
----
 
 ---
+// Фронтматтер Astro - здесь используется JavaScript для настройки компонента
+const startRecognition = () => {
+  const recognition = new window.webkitSpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = document.getElementById('lang-selector').value;
+  recognition.onstart = () => {
+    document.getElementById('start-stop').textContent = 'Stop';
+  };
+  recognition.onend = () => {
+    document.getElementById('start-stop').textContent = 'Start';
+  };
+  recognition.onresult = (event) => {
+    let transcript = '';
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      transcript += event.results[i][0].transcript;
+    }
+    document.getElementById('transcript').textContent = transcript;
+  };
+  recognition.onerror = (event) => {
+    console.error('Recognition error:', event.error);
+  };
+  recognition.start();
+};
 
+const stopRecognition = () => {
+  window.recognition.stop();
+};
+
+let isRecognizing = false;
+const toggleRecognition = () => {
+  if (isRecognizing) {
+    stopRecognition();
+  } else {
+    startRecognition();
+  }
+  isRecognizing = !isRecognizing;
+};
+---
+
+<!-- Разметка компонента -->
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+<head>
+    <meta charset="UTF-8" />
+    <title>Speech Recognition</title>
+</head>
+<body>
+    <h1>Speech Recognition Demo</h1>
+    <label for="lang-selector">Choose a language:</label>
+    <select id="lang-selector">
+        <option value="en-US">English (US)</option>
+        <option value="fr-FR">French (France)</option>
+        <option value="ja-JP">Japanese (Japan)</option>
+    </select>
+    
+    <button id="start-stop" on:click={toggleRecognition}>Start</button>
+    <div id="transcript">Transcript will be displayed here...</div>
+
+    <script>
+      // Сюда можно поместить элементы сценариев, которые применяются только после загрузки страницы
+    </script>
+</body>
 </html>

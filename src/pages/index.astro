@@ -1,50 +1,12 @@
-
 ---
-// Фронтматтер Astro - здесь используется JavaScript для настройки компонента
-const startRecognition = () => {
-  const recognition = new window.webkitSpeechRecognition();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = document.getElementById('lang-selector').value;
-  recognition.onstart = () => {
-    document.getElementById('start-stop').textContent = 'Stop';
-  };
-  recognition.onend = () => {
-    document.getElementById('start-stop').textContent = 'Start';
-  };
-  recognition.onresult = (event) => {
-    let transcript = '';
-    for (let i = event.resultIndex; i < event.results.length; ++i) {
-      transcript += event.results[i][0].transcript;
-    }
-    document.getElementById('transcript').textContent = transcript;
-  };
-  recognition.onerror = (event) => {
-    console.error('Recognition error:', event.error);
-  };
-  recognition.start();
-};
-
-const stopRecognition = () => {
-  window.recognition.stop();
-};
-
-let isRecognizing = false;
-const toggleRecognition = () => {
-  if (isRecognizing) {
-    stopRecognition();
-  } else {
-    startRecognition();
-  }
-  isRecognizing = !isRecognizing;
-};
+// Здесь можно разместить серверный JavaScript
+// В фронтматтере Astro, который будет выполняться на сервере
+// Объект `window` должен быть использован только в клиентском JavaScript
 ---
-
-<!-- Разметка компонента -->
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Speech Recognition</title>
+    <title>Speech Recognition Demo</title>
 </head>
 <body>
     <h1>Speech Recognition Demo</h1>
@@ -55,11 +17,57 @@ const toggleRecognition = () => {
         <option value="ja-JP">Japanese (Japan)</option>
     </select>
     
-    <button id="start-stop" on:click={toggleRecognition}>Start</button>
+    <button id="start-stop">Start</button>
     <div id="transcript">Transcript will be displayed here...</div>
 
     <script>
-      // Сюда можно поместить элементы сценариев, которые применяются только после загрузки страницы
+      // Этот скрипт будет работать на стороне клиента, так как он внутри тега <script>
+      let recognition;
+      let isRecognizing = false;
+      
+      document.addEventListener('DOMContentLoaded', function() {
+          var langSelector = document.getElementById('lang-selector');
+          var btnStartStop = document.getElementById('start-stop');
+          var transcriptDiv = document.getElementById('transcript');
+
+          function startRecognition() {
+              recognition = new window.webkitSpeechRecognition();
+              recognition.continuous = true;
+              recognition.interimResults = true;
+              recognition.lang = langSelector.value;
+              recognition.onstart = function() {
+                  isRecognizing = true;
+                  btnStartStop.textContent = 'Stop';
+              };
+              recognition.onend = function() {
+                  isRecognizing = false;
+                  btnStartStop.textContent = 'Start';
+              };
+              recognition.onresult = function(event) {
+                  var transcript = '';
+                  for (var i = event.resultIndex; i < event.results.length; ++i) {
+                      transcript += event.results[i][0].transcript;
+                  }
+                  transcriptDiv.textContent = transcript;
+              };
+              recognition.onerror = function(event) {
+                  console.error('Recognition error:', event.error);
+              };
+              recognition.start();
+          }
+
+          function stopRecognition() {
+              recognition.stop();
+          }
+
+          btnStartStop.addEventListener('click', function() {
+              if (isRecognizing) {
+                  stopRecognition();
+              } else {
+                  startRecognition();
+              }
+          });
+      });
     </script>
 </body>
 </html>

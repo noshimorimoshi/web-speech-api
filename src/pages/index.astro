@@ -48,7 +48,7 @@
                   for (var i = event.resultIndex; i < event.results.length; ++i) {
                       transcript += event.results[i][0].transcript;
                   }
-                  transcriptDiv.textContent = transcript;
+                  transcriptDiv.textContent += transcript;
               };
               recognition.onerror = function(event) {
                   console.error('Recognition error:', event.error);

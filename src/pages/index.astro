@@ -18,7 +18,7 @@
     </select>
     
     <button id="start-stop">Start</button>
-    <div id="transcript">Transcript will be displayed here...</div>
+    <div id="transcript"></div>
 
     <script>
       // Этот скрипт будет работать на стороне клиента, так как он внутри тега <script>
@@ -44,11 +44,11 @@
                   btnStartStop.textContent = 'Start';
               };
               recognition.onresult = function(event) {
-                  var transcript = '';
+                  var transcript = transcriptDiv.textContent; // Получаем текущий текст из div
                   for (var i = event.resultIndex; i < event.results.length; ++i) {
-                      transcript += event.results[i][0].transcript;
+                      transcript += event.results[i][0].transcript; // Добавляем новый транскрипт
                   }
-                  transcriptDiv.textContent += transcript;
+                  transcriptDiv.textContent = transcript; // Обновляем div новым полным текстом
               };
               recognition.onerror = function(event) {
                   console.error('Recognition error:', event.error);

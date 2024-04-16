@@ -44,11 +44,15 @@
                   btnStartStop.textContent = 'Start';
               };
               recognition.onresult = function(event) {
-                  var transcript = transcriptDiv.textContent; // Получаем текущий текст из div
+                  var transcript = '';
                   for (var i = event.resultIndex; i < event.results.length; ++i) {
-                      transcript += event.results[i][0].transcript; // Добавляем новый транскрипт
+                      // Проверяем, является ли результат финальным
+                      if (event.results[i].isFinal) {
+                          transcript += event.results[i][0].transcript;
+                      }
                   }
-                  transcriptDiv.textContent = transcript; // Обновляем div новым полным текстом
+                  // Обновляем текст транскрибации только финальными результатами
+                  transcriptDiv.textContent = transcript;
               };
               recognition.onerror = function(event) {
                   console.error('Recognition error:', event.error);

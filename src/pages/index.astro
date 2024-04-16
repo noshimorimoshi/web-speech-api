@@ -21,57 +21,55 @@
     <div id="transcript"></div>
 
     <script>
-      // Этот скрипт будет работать на стороне клиента, так как он внутри тега <script>
       let recognition;
-      let isRecognizing = false;
-      
-      document.addEventListener('DOMContentLoaded', function() {
-          var langSelector = document.getElementById('lang-selector');
-          var btnStartStop = document.getElementById('start-stop');
-          var transcriptDiv = document.getElementById('transcript');
+let isRecognizing = false;
+let finalTranscript = ''; // Добавляем переменную для хранения окончательного текста
 
-          function startRecognition() {
-              recognition = new window.webkitSpeechRecognition();
-              recognition.continuous = true;
-              recognition.interimResults = true;
-              recognition.lang = langSelector.value;
-              recognition.onstart = function() {
-                  isRecognizing = true;
-                  btnStartStop.textContent = 'Stop';
-              };
-              recognition.onend = function() {
-                  isRecognizing = false;
-                  btnStartStop.textContent = 'Start';
-              };
-              recognition.onresult = function(event) {
-                  var transcript = '';
-                  for (var i = event.resultIndex; i < event.results.length; ++i) {
-                      // Проверяем, является ли результат финальным
-                      if (event.results[i].isFinal) {
-                          transcript += event.results[i][0].transcript;
-                      }
-                  }
-                  // Обновляем текст транскрибации только финальными результатами
-                  transcriptDiv.textContent = transcript;
-              };
-              recognition.onerror = function(event) {
-                  console.error('Recognition error:', event.error);
-              };
-              recognition.start();
-          }
+document.addEventListener('DOMContentLoaded', function() {
+    var langSelector = document.getElementById('lang-selector');
+    var btnStartStop = document.getElementById('start-stop');
+    var transcriptDiv = document.getElementById('transcript');
 
-          function stopRecognition() {
-              recognition.stop();
-          }
+    function startRecognition() {
+        recognition = new window.webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = false; // Изменено для использования только финальных результатов
+        recognition.lang = langSelector.value;
+        recognition.onstart = function() {
+            isRecognizing = true;
+            btnStartStop.textContent = 'Stop';
+        };
+        recognition.onend = function() {
+            isRecognizing = false;
+            btnStartStop.textContent = 'Start';
+        };
+        recognition.onresult = function(event) {
+            for (var i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript + ' '; // Добавляем текст к окончательному транскрипту
+                }
+            }
+            transcriptDiv.textContent = finalTranscript; // Обновляем div окончательным транскриптом
+        };
+        recognition.onerror = function(event) {
+            console.error('Recognition error:', event.error);
+        };
+        recognition.start();
+    }
 
-          btnStartStop.addEventListener('click', function() {
-              if (isRecognizing) {
-                  stopRecognition();
-              } else {
-                  startRecognition();
-              }
-          });
-      });
+    function stopRecognition() {
+        recognition.stop();
+    }
+
+    btnStartStop.addEventListener('click', function() {
+        if (isRecognizing) {
+            stopRecognition();
+        } else {
+            startRecognition();
+        }
+    });
+});
+
     </script>
 </body>
 </html>
